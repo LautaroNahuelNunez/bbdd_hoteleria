@@ -1,0 +1,116 @@
+CREATE DATABASE hoteleria; 
+
+USE hoteleria; 
+
+CREATE TABLE paises (
+id_pais INT PRIMARY KEY IDENTITY (1,1), 
+pais VARCHAR(50) NOT NULL 
+); 
+
+CREATE TABLE idiomas ( 
+id_idioma INT PRIMARY KEY IDENTITY (1,1), 
+idioma VARCHAR(20) NOT NULL 
+); 
+
+CREATE TABLE empleados( 
+id_empleado INT PRIMARY KEY IDENTITY (1,1), 
+nombre VARCHAR (100) NOT NULL,
+apellido VARCHAR (100) NOT NULL,
+dni CHAR (8) NOT NULL,
+direccion VARCHAR (100) NOT NULL,
+telefono VARCHAR (20) NOT NULL,
+cuil CHAR(11) NOT NULL UNIQUE
+);
+
+CREATE TABLE establecimientos(
+id_establecimiento INT PRIMARY KEY IDENTITY (1,1),
+nombre_establecimiento VARCHAR(100) NOT NULL, 
+direccion VARCHAR(100) NOT NULL, 
+telefono VARCHAR (20) NOT NULL, 
+contacto int NULL,
+FOREIGN KEY (contacto)
+REFERENCES empleados(id_empleado)
+ON UPDATE CASCADE ON DELETE NO ACTION
+);
+
+CREATE TABLE empleado_idioma( 
+id_idioma INT NOT NULL, 
+id_empleado INT NOT NULL,
+FOREIGN KEY (id_idioma)
+REFERENCES idiomas(id_idioma)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+FOREIGN KEY (id_empleado)
+REFERENCES empleados(id_empleado)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+CONSTRAINT id_empleado_idioma PRIMARY KEY (id_idioma ASC, id_empleado ASC)
+);
+
+CREATE TABLE actividades( 
+id_actividad INT PRIMARY KEY IDENTITY (1,1), 
+descripcion VARCHAR(1000) NULL, 
+nivel_dificultad INT
+);
+
+CREATE TABLE tipo_habitacion( 
+id_tipo_habitacion INT PRIMARY KEY IDENTITY (1,1),
+descripcion VARCHAR(1000) NULL 
+); 
+
+CREATE TABLE establecimiento_habitacion( 
+id_habitacion INT PRIMARY KEY IDENTITY (1,1), 
+id_establecimiento INT NOT NULL, 
+id_tipo_habitacion INT NOT NULL, 
+nro_habitacion CHAR(3) NOT NULL, 
+tarifa DECIMAL (5,2) NOT NULL,
+FOREIGN KEY (id_establecimiento)
+REFERENCES establecimientos(id_establecimiento)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+FOREIGN KEY (id_tipo_habitacion)
+REFERENCES tipo_habitacion(id_tipo_habitacion)
+ON UPDATE CASCADE ON DELETE NO ACTION
+);
+
+CREATE TABLE pasajeros(
+id_pasajero INT PRIMARY KEY IDENTITY (1,1), 
+nombre VARCHAR(50) NOT NULL,
+apellido VARCHAR (50) NOT NULL,
+dni CHAR(8),
+pasaporte CHAR(9),
+id_idioma INT NOT NULL, 
+id_pais INT NOT NULL,
+telefono VARCHAR (20),
+FOREIGN KEY (id_idioma)
+REFERENCES idiomas(id_idioma)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+FOREIGN KEY (id_pais)
+REFERENCES paises(id_pais)
+ON UPDATE CASCADE ON DELETE NO ACTION
+); 
+
+CREATE TABLE pasajero_habitacion( 
+id_habitacion INT NOT NULL,
+id_pasajero INT NOT NULL,
+fecha DATE NOT NULL,
+CONSTRAINT [id_pasajero_habitacion] PRIMARY KEY ( id_pasajero ASC,
+id_habitacion ASC, fecha ASC),
+FOREIGN KEY (id_habitacion)
+REFERENCES establecimiento_habitacion(id_habitacion)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+FOREIGN KEY (id_pasajero)
+REFERENCES pasajeros(id_pasajero)
+ON UPDATE CASCADE ON DELETE NO ACTION
+);  
+
+
+CREATE TABLE pasajero_actividad( 
+id_pasajero INT NOT NULL, 
+id_actividad INT NOT NULL,
+fecha DATE NOT NULL,
+FOREIGN KEY (id_pasajero)
+REFERENCES pasajeros(id_pasajero)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+FOREIGN KEY (id_actividad)
+REFERENCES actividades(id_actividad)
+ON UPDATE CASCADE ON DELETE NO ACTION,
+CONSTRAINT [id_pasajero_actividad] PRIMARY KEY ( id_pasajero, id_actividad, fecha ) 
+);
